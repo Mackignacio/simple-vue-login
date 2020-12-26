@@ -1,30 +1,48 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+  <div class="container">
+    <div v-if="showAlert" className="alert alert-danger" role="alert">
+      {{ alertMessage }}
+    </div>
+    <Home v-if="isLogin" :user="user"></Home>
+    <Login v-else @set-alert="setAlert" @set-login="setLogin"></Login>
   </div>
-  <router-view />
 </template>
+
+<script lang="ts">
+import { Options, Vue } from "vue-class-component";
+import Login from "@/components/Login.vue";
+import Home, { UserData } from "@/views/Home.vue";
+
+@Options({
+  components: { Home, Login },
+})
+export default class App extends Vue {
+  alertMessage = "";
+  showAlert = false;
+  isLogin = false;
+  user: UserData = { email: "", password: "", name: "" };
+
+  setAlert(event: { status: boolean; alertMessage: string }) {
+    const { status, alertMessage } = event;
+    this.showAlert = status;
+    this.alertMessage = alertMessage;
+
+    setTimeout(() => {
+      this.showAlert = false;
+      this.alertMessage = "";
+    }, 2000);
+  }
+
+  setLogin(event: { status: boolean; user: UserData }) {
+    const { status, user } = event;
+    this.isLogin = status;
+    this.user = user;
+  }
+}
+</script>
 
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+  padding: 0.5rem;
 }
 </style>
